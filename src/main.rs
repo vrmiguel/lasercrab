@@ -15,19 +15,18 @@ fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>) {
     let width  = 1920;
     let height = 1080;
     let fov = std::f64::consts::PI/3.;
-    let origin = Vec3f::new(0., 0., 0.);    
+    let origin = Vec3f::new(0., 0., 0.);
+    let fovtan = f64::tan(fov/2.);
     
     let mut canvas = Canvas::new(width, height);
 
     for j in 0..height {
         for i in 0..width {
-            // let idx = i + j * width;
             let (iu, ju) = (i, j);
-            let (i, j, width, height) = (i as f64, j as f64, width as f64, height as f64); 
-            let x =  (2.0*(i + 0.5)/width  - 1.0)*f64::tan(fov/2.)*width/height;
-            let y = -(2.0*(j + 0.5)/height - 1.0)*f64::tan(fov/2.);
-            let dir = Vec3f::new(x, y, -1.0);
-            let dir = dir.normalize();
+            let (i, j, width, height) = ((2*i) as f64, (2*j) as f64, width as f64, height as f64); 
+            let x =  ((i + 1.)/width  - 1.0)*fovtan*width/height;
+            let y = -((j + 1.)/height - 1.0)*fovtan;
+            let dir = Vec3f::new(x, y, -1.0).normalize();
             let ray = Ray::new(origin, dir);
             canvas.set(iu, ju, ray.cast(spheres, lights, 0));
         }
@@ -38,7 +37,6 @@ fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>) {
 }
 
 fn main() {
-    // let sphere = Sphere::new(Vec3f::new(-3.0, 0.0, -16.0), 2.0);
     let ivory = Material::new(
         Vec3f::new(0.4, 0.4, 0.3),
         Vec3f::new(0.6, 0.3, 0.1),
@@ -58,35 +56,35 @@ fn main() {
     let mut spheres = Vec::with_capacity(5);
 
     spheres.push(Sphere::new(
-        Vec3f::new(-20.,    5.,   -20.), 6., mirror)
+        Vec3f::new(-20., 5., -20.), 6., mirror)
     );
 
     spheres.push(Sphere::new(
-        Vec3f::new(-3.,    0.,   -16.), 2., ivory)
+        Vec3f::new(-3., 0., -16.), 2., ivory)
     );
 
     spheres.push(Sphere::new(
-        Vec3f::new(-1.,    -1.5,   -12.), 2., mirror)
+        Vec3f::new(-1., -1.5, -12.), 2., mirror)
     );
 
 
     spheres.push(Sphere::new(
-        Vec3f::new(1.5,    -0.5,   -18.), 3., red_rubber)
+        Vec3f::new(1.5, -0.5, -18.), 3., red_rubber)
     );
 
     spheres.push(Sphere::new(
-        Vec3f::new(18.5,    -0.5,   -18.), 3., ivory)
+        Vec3f::new(18.5, -0.5, -18.), 3., ivory)
     );
 
     spheres.push(Sphere::new(
-        Vec3f::new(7.,    5.,   -18.), 4., mirror)
+        Vec3f::new(7., 5., -18.), 4., mirror)
     );
 
     let mut lights = Vec::with_capacity(3);
 
-    lights.push(Light::new(Vec3f::new(-20., 20.,  20.), 1.5));
-    lights.push(Light::new(Vec3f::new(30., 50.,  -25.), 1.8));
-    lights.push(Light::new(Vec3f::new(30., 20.,  30.), 1.7));
+    lights.push(Light::new(Vec3f::new(-20., 20., 20.), 1.5));
+    lights.push(Light::new(Vec3f::new(30., 50., -25.), 1.8));
+    lights.push(Light::new(Vec3f::new(30., 20., 30.), 1.7));
 
     render(&mut spheres, &mut lights);
 }

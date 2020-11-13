@@ -40,16 +40,12 @@ impl Ray {
 		if f64::abs(self.direction[1]) > 0.001 {
 			let d = -(self.origin[1]+4.)/self.direction[1];
 			let pt = self.origin + self.direction * d;
-			// if (d>0 && fabs(pt.x)<10 && pt.z<-10 && pt.z>-30 && d<spheres_dist) 
 			if d > 0. && f64::abs(pt[0]) < 10. && pt[2] > -30. && d < spheres_dist {
 				checkerboard_dist = d;
 				*hit = pt;
 				*N = Vec3f::new(0., 1., 0.);
-				let val_a = 0.5*(hit[0])+1000.;
-				// TODO: try not casting to int
-				let val_a = val_a as i32;
-				let val_b = 0.5 * hit[2];
-				let val_b = val_b as i32;
+				let val_a = (0.5*(hit[0])+1000.) as i32;
+				let val_b = (0.5 * hit[2]) as i32;
 				material.diffuse_color = if (val_a + val_b & 1) > 0 {
 					Vec3f::new(0.3, 0.3, 0.3)
 				} else {
@@ -92,9 +88,9 @@ impl Ray {
 		let mut diffuse_light_intensity = 0.;
 		let mut specular_light_intensity = 0.;
 		for light in lights {
-			// TODO: test explicit Vec3f and a single light.position - point 
-			let light_dir = (light.position - point).normalize();
-			let light_distance: f64 = (light.position - point).norm();
+			let light_vec = light.position - point;
+			let light_dir = light_vec.normalize();
+			let light_distance: f64 = light_vec.norm();
 
 			let shadow_origin = if light_dir.dot(&N) < 0. {
 				point - N * 0.001
@@ -105,8 +101,8 @@ impl Ray {
 			let mut shadow_N = Vec3f::new(0., 0., 0.);
 			let mut unused_material = Material::new(
 				Vec3f::new(0., 0., 0.),
-			   Vec3f::new(1., 0., 0.),
-			   0.
+				Vec3f::new(1., 0., 0.),
+				0.
 			);
 
 			let shadow_ray = Ray::new(
@@ -123,9 +119,6 @@ impl Ray {
 				f64::max(0., vector::reflect(light_dir, N).dot(&self.direction)), 
 				   material.specular_exponent) * light.intensity;
 		}
-		
-		//     return material.diffuse_color * diffuse_light_intensity * material.albedo[0] +
-		//     Vec3f(1., 1., 1.)*specular_light_intensity * material.albedo[1];
 
 		material.albedo[0] * diffuse_light_intensity * material.diffuse_color +
 		material.albedo[1] * Vec3f::new(1., 1., 1.) * specular_light_intensity +
@@ -170,14 +163,17 @@ impl Sphere {
 			return None;
 		}
 		let thc = f64::sqrt(radius_sqr - d2);
-		let (t0, t1) = (adj - thc, adj + thc);
- 
-		if t0 < 0.0 && t1 < 0.0 {
-			return None;
+		
+		match (adj - thc, adj + thc) {
+			(x, y) if x < 0. && y < 0. => {
+				None
+			},
+			(x, y) if x < y => {
+				Some(x)
+			}
+			(_, y) => {
+				Some(y)
+			}
 		}
- 
-		Some(
-			if t0 < t1 { t0 } else { t1 }
-		)
 	}
 }
