@@ -71,7 +71,7 @@ impl Ray {
 		   0.
 		);
         if depth > 4 || !self.scene_intersections(spheres, &mut point, &mut N, &mut material) {
-			return Vec3f::new(0.2, 0.7, 0.8);
+			return Vec3f::new(0.6, 0.4, 0.4);
 		}
 
 		let reflect_dir = vector::reflect(self.direction, N);

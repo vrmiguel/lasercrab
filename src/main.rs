@@ -12,9 +12,9 @@ use vector::Vec3f;
 use light::Light;
 
 fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>) {
-    let width  = 3840;
-    let height = 2160;
-    let fov = std::f64::consts::PI/3.0;
+    let width  = 1920;
+    let height = 1080;
+    let fov = std::f64::consts::PI/3.;
     let origin = Vec3f::new(0., 0., 0.);    
     
     let mut canvas = Canvas::new(width, height);
@@ -33,7 +33,7 @@ fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>) {
         }
     }
 
-    canvas.save_to_image("outy.ppm");
+    canvas.save_to_image("output.ppm");
  
 }
 
@@ -55,7 +55,12 @@ fn main() {
         1425.
     );
 
-    let mut spheres = Vec::with_capacity(4);
+    let mut spheres = Vec::with_capacity(5);
+
+    spheres.push(Sphere::new(
+        Vec3f::new(-20.,    5.,   -20.), 6., mirror)
+    );
+
     spheres.push(Sphere::new(
         Vec3f::new(-3.,    0.,   -16.), 2., ivory)
     );
@@ -67,6 +72,10 @@ fn main() {
 
     spheres.push(Sphere::new(
         Vec3f::new(1.5,    -0.5,   -18.), 3., red_rubber)
+    );
+
+    spheres.push(Sphere::new(
+        Vec3f::new(18.5,    -0.5,   -18.), 3., ivory)
     );
 
     spheres.push(Sphere::new(
