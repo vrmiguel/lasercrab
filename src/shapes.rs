@@ -34,7 +34,31 @@ impl Ray {
 			}
 		}
 
-		spheres_dist < 1000.
+		let mut checkerboard_dist = f64::MAX;
+
+
+		if f64::abs(self.direction[1]) > 0.001 {
+			let d = -(self.origin[1]+4.)/self.direction[1];
+			let pt = self.origin + self.direction * d;
+			// if (d>0 && fabs(pt.x)<10 && pt.z<-10 && pt.z>-30 && d<spheres_dist) 
+			if d > 0. && f64::abs(pt[0]) < 10. && pt[2] > -30. && d < spheres_dist {
+				checkerboard_dist = d;
+				*hit = pt;
+				*N = Vec3f::new(0., 1., 0.);
+				let val_a = 0.5*(hit[0])+1000.;
+				// TODO: try not casting to int
+				let val_a = val_a as i32;
+				let val_b = 0.5 * hit[2];
+				let val_b = val_b as i32;
+				material.diffuse_color = if (val_a + val_b & 1) > 0 {
+					Vec3f::new(0.3, 0.3, 0.3)
+				} else {
+					Vec3f::new(0.3, 0.2, 0.1)
+				}
+			}
+		}
+
+		f64::min(spheres_dist, checkerboard_dist) < 1000.
 	}
 
 	#[allow(non_snake_case)]
