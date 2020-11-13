@@ -54,9 +54,6 @@ impl Canvas {
                 let byte = 255_f64 * f64::max(0.0, f64::min(1.0, self.framebuffer[i][j]));
                 let byte = byte as u8;
                 bytes.push(byte);
-                // let bchar = byte as char;
-                // catch!(write!(f, "{}", bchar));
-                // println!("{}", byte);
             }
         }
         if let Err(err)  = f.write_all(&bytes) {

@@ -10,6 +10,11 @@ pub struct Ray {
     pub direction: Vec3f
 }
 
+/// Color with hex code #ed9e4f, used by the checkerboard
+const BIG_FOOT_FEET: Vec3f = Vec3f::new(0.3, 0.3, 0.3);
+const WHITE: Vec3f = Vec3f::new(0.3, 0.2, 0.1);
+/// Color with hex code #996666, used for the background
+const COPPER_ROSE: Vec3f = Vec3f::new(0.6, 0.4, 0.4);
 
 impl Ray {
     pub fn new (origin: Vec3f, dir: Vec3f) -> Ray {
@@ -37,7 +42,8 @@ impl Ray {
 		let mut checkerboard_dist = f64::MAX;
 
 
-		if f64::abs(self.direction[1]) > 0.001 {
+		if f64::abs(self.direction[1]) > 0.001 
+		{
 			let d = -(self.origin[1]+4.)/self.direction[1];
 			let pt = self.origin + self.direction * d;
 			if d > 0. && f64::abs(pt[0]) < 10. && pt[2] > -30. && d < spheres_dist {
@@ -47,9 +53,9 @@ impl Ray {
 				let val_a = (0.5*(hit[0])+1000.) as i32;
 				let val_b = (0.5 * hit[2]) as i32;
 				material.diffuse_color = if (val_a + val_b & 1) > 0 {
-					Vec3f::new(0.3, 0.3, 0.3)
+					BIG_FOOT_FEET
 				} else {
-					Vec3f::new(0.3, 0.2, 0.1)
+					WHITE
 				}
 			}
 		}
@@ -59,15 +65,15 @@ impl Ray {
 
 	#[allow(non_snake_case)]
     pub fn cast (self, spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>, depth: usize) -> Vec3f {
-		let mut point = Vec3f::new(0., 0., 0.);
-		let mut N = Vec3f::new(0., 0., 0.);
+		let mut point = vector::ORIGIN;
+		let mut N = vector::ORIGIN;
 		let mut material = Material::new(
-			Vec3f::new(0., 0., 0.),
-		   Vec3f::new(1., 0., 0.),
-		   0.
+			vector::ORIGIN,
+			vector::I,
+		    0.
 		);
         if depth > 4 || !self.scene_intersections(spheres, &mut point, &mut N, &mut material) {
-			return Vec3f::new(0.6, 0.4, 0.4);
+			return COPPER_ROSE;
 		}
 
 		let reflect_dir = vector::reflect(self.direction, N);
@@ -97,11 +103,11 @@ impl Ray {
 			} else {
 				point + N * 0.001	
 			};
-			let mut shadow_point = Vec3f::new(0., 0., 0.);
-			let mut shadow_N = Vec3f::new(0., 0., 0.);
+			let mut shadow_point = vector::ORIGIN;
+			let mut shadow_N = vector::ORIGIN;
 			let mut unused_material = Material::new(
-				Vec3f::new(0., 0., 0.),
-				Vec3f::new(1., 0., 0.),
+				vector::ORIGIN,
+				vector::I,
 				0.
 			);
 
@@ -120,9 +126,9 @@ impl Ray {
 				   material.specular_exponent) * light.intensity;
 		}
 
-		material.albedo[0] * diffuse_light_intensity * material.diffuse_color +
-		material.albedo[1] * Vec3f::new(1., 1., 1.) * specular_light_intensity +
-		material.albedo[2] * reflection_color
+		material.albedo.x * diffuse_light_intensity * material.diffuse_color +
+		material.albedo.y * Vec3f::new(1., 1., 1.) * specular_light_intensity +
+		material.albedo.z * reflection_color
 	}
 	
 }
