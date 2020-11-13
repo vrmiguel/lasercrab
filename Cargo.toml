@@ -1,0 +1,17 @@
+[package]
+name = "lasercrab"
+version = "0.5.0"
+authors = ["Vinícius Rodrigues Miguel <vinicius.miguel@unifesp.br>"]
+edition = "2018"
+
+[dependencies]
+nalgebra = "0.20"
+
+[profile.dev]
+opt-level = 0
+incremental = true
+
+# dependencies are built with optimizations
+[profile.dev.package."*"]
+opt-level = 3
+incremental = false
