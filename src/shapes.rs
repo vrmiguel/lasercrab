@@ -143,7 +143,7 @@ pub struct Sphere {
 
 
 impl Sphere {
-	pub fn new(center: Vec3f, radius: f64, material: Material) -> Sphere {
+	pub const fn new(center: Vec3f, radius: f64, material: Material) -> Sphere {
 		Sphere {
 			center,
 			radius,

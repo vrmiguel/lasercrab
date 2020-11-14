@@ -11,7 +11,43 @@ use material::Material;
 use vector::Vec3f;
 use light::Light;
 
-fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>) {
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
+
+const IVORY: Material = Material::new(
+        Vec3f::new(0.4, 0.4, 0.3),
+        Vec3f::new(0.6, 0.3, 0.1),
+        50.
+);
+
+// const MORE_REFLECTIVE_IVORY: Material = Material::new(
+//         Vec3f::new(0.4, 0.4, 0.3),
+//         Vec3f::new(0.6, 0.3, 0.1),
+//         100.
+// );
+
+const RED_RUBBER: Material = Material::new(
+        Vec3f::new(0.3, 0.1, 0.1),
+        Vec3f::new(0.9, 0.1, 0.0),
+        10.
+);
+
+const MIRROR: Material = Material::new (
+        Vec3f::new(1.0, 1.0, 1.0),
+        Vec3f::new(0.0, 10.0, 0.8),
+        1425.
+);
+
+const SPHERES: [Sphere; 5] = [
+                Sphere::new(Vec3f::new(-20., 5., -20.), 6., MIRROR),
+                Sphere::new(Vec3f::new(-3. , 0., -16.), 2., IVORY),
+                Sphere::new(Vec3f::new(-1., -1.5, -12.), 2., MIRROR),
+                Sphere::new(Vec3f::new(1.5, -0.5, -18.), 3., RED_RUBBER),
+                Sphere::new(Vec3f::new(7., 5., -18.), 4., MIRROR),
+];
+
+
+fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>, filename: &str) {
     let width  = 1920;
     let height = 1080;
     let fov = std::f64::consts::PI/3.;
@@ -32,59 +68,63 @@ fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>) {
         }
     }
 
-    canvas.save_to_image("output.ppm");
+    canvas.save_to_image(&format!("{}.ppm", filename).to_string());
  
 }
 
 fn main() {
-    let ivory = Material::new(
-        Vec3f::new(0.4, 0.4, 0.3),
-        Vec3f::new(0.6, 0.3, 0.1),
-        50.
-    );
-    let red_rubber = Material::new(
-        Vec3f::new(0.3, 0.1, 0.1),
-        Vec3f::new(0.9, 0.1, 0.0),
-        10.
-    );
-    let mirror = Material::new (
-        Vec3f::new(1.0, 1.0, 1.0),
-        Vec3f::new(0.0, 10.0, 0.8),
-        1425.
-    );
-
-    let mut spheres = Vec::with_capacity(5);
-
-    spheres.push(Sphere::new(
-        Vec3f::new(-20., 5., -20.), 6., mirror)
-    );
-
-    spheres.push(Sphere::new(
-        Vec3f::new(-3., 0., -16.), 2., ivory)
-    );
-
-    spheres.push(Sphere::new(
-        Vec3f::new(-1., -1.5, -12.), 2., mirror)
-    );
 
 
-    spheres.push(Sphere::new(
-        Vec3f::new(1.5, -0.5, -18.), 3., red_rubber)
-    );
+    #[cfg(not(feature = "parallel"))]
+    // There'd be a closure problem when using this variable within the parallelized code
+    let mut spheres = SPHERES.to_vec();
 
-    spheres.push(Sphere::new(
-        Vec3f::new(18.5, -0.5, -18.), 3., ivory)
-    );
+    #[cfg(feature = "parallel")]
+    {
+        (0..300).into_par_iter().for_each(|i|
+        {
+            let i = i as f64;
 
-    spheres.push(Sphere::new(
-        Vec3f::new(7., 5., -18.), 4., mirror)
-    );
+            let morphing_diffuse_color = if i > 150. {
+                1.0
+            } else {
+                i * 0.006 + 0.1
+            };
 
-    let mut lights = Vec::with_capacity(3);
+            let morphing_material = Material::new(
+                Vec3f::new(morphing_diffuse_color, morphing_diffuse_color, morphing_diffuse_color),
+                Vec3f::new(10.0 - 2.*i * 0.03333, 2.*i + 0.033333, 2.*i * 0.00266666),
+                if i > 142. {
+                    1425.
+                } else {
+                    10. + 15. * i 
+                }
+            );
 
-    lights.push(Light::new(Vec3f::new(-20., 20., 20.), 1.5));
-    lights.push(Light::new(Vec3f::new(30., 50., -25.), 1.8));
-    lights.push(Light::new(Vec3f::new(30., 20., 30.), 1.7));
+            let mut spheres = SPHERES.to_vec();
+            spheres.push(Sphere::new(Vec3f::new(10. - i * 0.075, 10., -20.), 2., morphing_material));
 
-    render(&mut spheres, &mut lights);
+            let mut lights = vec![
+                Light::new(Vec3f::new(-20.+1.5*i, 20. + 1.5-i, 20.), 1.5),
+                Light::new(Vec3f::new(-40.+i, 50.+i, -25.+i/50.), 1.8 + i * 0.0005),            
+                Light::new(Vec3f::new(40.+i, 10.+i, 30.-i/50.), 1.7),
+                Light::new(Vec3f::new(260.-i, 160.-i, 130.-i/50.), 1.7)
+            ];        
+            let filename = format!("output_{}", i);
+            render(&mut spheres, &mut lights, &filename);
+            println!("{}.ppm saved!", filename);
+        }
+        ); 
+    }
+
+    #[cfg(not(feature = "parallel"))]
+    {
+        let mut lights = Vec::with_capacity(3);
+
+        lights.push(Light::new(Vec3f::new(-20., 20., 20.), 1.5));
+        lights.push(Light::new(Vec3f::new(30., 50., -25.), 1.8));
+        lights.push(Light::new(Vec3f::new(30., 20., 30.), 1.7));
+
+        render(&mut spheres, &mut lights, "output");
+    }    
 }

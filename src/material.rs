@@ -8,7 +8,7 @@ pub struct Material {
 }
 
 impl Material {
-    pub fn new (color: Vec3f, albedo: Vec3f, spec_exp: f64) -> Material {
+    pub const fn new (color: Vec3f, albedo: Vec3f, spec_exp: f64) -> Material {
         Material {
             diffuse_color: color,
             albedo,

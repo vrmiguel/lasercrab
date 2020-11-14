@@ -3,3 +3,9 @@ name = "lasercrab"
 version = "0.5.0"
 authors = ["Vinícius Rodrigues Miguel <vinicius.miguel@unifesp.br>"]
 edition = "2018"
+
+[dependencies]
+rayon = { version = "1.5.0", optional = true }
+
+[features]
+parallel = ["rayon"] 
