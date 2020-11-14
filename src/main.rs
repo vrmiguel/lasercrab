@@ -14,6 +14,14 @@ use light::Light;
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
 
+
+const WIDTH:  usize  = 1920;
+const HEIGHT: usize  = 1080;
+const WIDTH_F:  f64  = WIDTH as f64;
+const HEIGHT_F: f64  = HEIGHT as f64;
+const FOV: f64 = std::f64::consts::PI/3.;
+const ORIGIN: Vec3f = vector::ORIGIN;
+
 const IVORY: Material = Material::new(
         Vec3f::new(0.4, 0.4, 0.3),
         Vec3f::new(0.6, 0.3, 0.1),
@@ -48,22 +56,17 @@ const SPHERES: [Sphere; 5] = [
 
 
 fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>, filename: &str) {
-    let width  = 1920;
-    let height = 1080;
-    let fov = std::f64::consts::PI/3.;
-    let origin = Vec3f::new(0., 0., 0.);
-    let fovtan = f64::tan(fov/2.);
-    
-    let mut canvas = Canvas::new(width, height);
 
-    for j in 0..height {
-        for i in 0..width {
+    let mut canvas = Canvas::new(WIDTH, HEIGHT);
+
+    for j in 0..HEIGHT {
+        for i in 0..WIDTH {
             let (iu, ju) = (i, j);
-            let (i, j, width, height) = ((2*i) as f64, (2*j) as f64, width as f64, height as f64); 
-            let x =  ((i + 1.)/width  - 1.0)*fovtan*width/height;
-            let y = -((j + 1.)/height - 1.0)*fovtan;
+            let (i, j) = ((2*i) as f64, (2*j) as f64); 
+            let x =  ((i + 1.)/WIDTH_F  - 1.0)*f64::tan(FOV/2.)*WIDTH_F/HEIGHT_F;
+            let y = -((j + 1.)/HEIGHT_F - 1.0)*f64::tan(FOV/2.);
             let dir = Vec3f::new(x, y, -1.0).normalize();
-            let ray = Ray::new(origin, dir);
+            let ray = Ray::new(ORIGIN, dir);
             canvas.set(iu, ju, ray.cast(spheres, lights, 0));
         }
     }
@@ -81,34 +84,37 @@ fn main() {
 
     #[cfg(feature = "parallel")]
     {
-        (0..300).into_par_iter().for_each(|i|
+        (0..600).into_par_iter().for_each(|i|
         {
             let i = i as f64;
-
-            let morphing_diffuse_color = if i > 150. {
-                1.0
+            let j = if i > 300. {
+                600. - i
             } else {
-                i * 0.006 + 0.1
+                i
             };
 
-            let morphing_material = Material::new(
-                Vec3f::new(morphing_diffuse_color, morphing_diffuse_color, morphing_diffuse_color),
-                Vec3f::new(10.0 - 2.*i * 0.03333, 2.*i + 0.033333, 2.*i * 0.00266666),
-                if i > 142. {
-                    1425.
-                } else {
-                    10. + 15. * i 
-                }
-            );
-
             let mut spheres = SPHERES.to_vec();
-            spheres.push(Sphere::new(Vec3f::new(10. - i * 0.075, 10., -20.), 2., morphing_material));
+            spheres.push(Sphere::new(Vec3f::new(10. - j * 0.075, 10., -20.), 2., MIRROR));
 
+
+            let r = 20.;
+        
             let mut lights = vec![
-                Light::new(Vec3f::new(-20.+1.5*i, 20. + 1.5-i, 20.), 1.5),
-                Light::new(Vec3f::new(-40.+i, 50.+i, -25.+i/50.), 1.8 + i * 0.0005),            
-                Light::new(Vec3f::new(40.+i, 10.+i, 30.-i/50.), 1.7),
-                Light::new(Vec3f::new(260.-i, 160.-i, 130.-i/50.), 1.7)
+                Light::new(Vec3f::new(
+                    -20. + r*f64::cos(i/20.), 
+                     20. + r*f64::sin(i/20.), 
+                     20.), 
+                1.5),
+                Light::new(Vec3f::new(
+                    40.+5. * r*f64::cos(i/25.), 
+                    20., 
+                    30. + 5. *r*f64::sin(i/25.)),
+                1.7),
+                Light::new(Vec3f::new(
+                    260.-i, 
+                    160. * r*f64::cos(i/20.), 
+                    130. * r*f64::sin(i/20.)), 
+                1.7)
             ];        
             let filename = format!("output_{}", i);
             render(&mut spheres, &mut lights, &filename);

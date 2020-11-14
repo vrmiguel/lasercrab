@@ -16,6 +16,8 @@ const WHITE: Vec3f = Vec3f::new(0.3, 0.2, 0.1);
 /// Color with hex code #996666, used for the background
 const COPPER_ROSE: Vec3f = Vec3f::new(0.6, 0.4, 0.4);
 
+const SHADOW_BIAS: f64 = 0.001;
+
 impl Ray {
     pub fn new (origin: Vec3f, dir: Vec3f) -> Ray {
         Ray {
@@ -78,9 +80,9 @@ impl Ray {
 
 		let reflect_dir = vector::reflect(self.direction, N);
 		let reflect_orig = if reflect_dir.dot(&N) < 0. {
-			point - N * 1e-3
+			point - N * SHADOW_BIAS
 		} else {
-			point + N * 1e-3
+			point + N * SHADOW_BIAS
 		};
 
 		let reflection = Ray::new (
@@ -99,9 +101,9 @@ impl Ray {
 			let light_distance: f64 = light_vec.norm();
 
 			let shadow_origin = if light_dir.dot(&N) < 0. {
-				point - N * 0.001
+				point - N * SHADOW_BIAS
 			} else {
-				point + N * 0.001	
+				point + N * SHADOW_BIAS
 			};
 			let mut shadow_point = vector::ORIGIN;
 			let mut shadow_N = vector::ORIGIN;
@@ -126,8 +128,8 @@ impl Ray {
 				   material.specular_exponent) * light.intensity;
 		}
 
-		material.albedo.x * diffuse_light_intensity * material.diffuse_color +
-		material.albedo.y * Vec3f::new(1., 1., 1.) * specular_light_intensity +
+		material.albedo.x * diffuse_light_intensity * material.diffuse_color   +
+		material.albedo.y * Vec3f::new(1., 1., 1.)  * specular_light_intensity +
 		material.albedo.z * reflection_color
 	}
 	
