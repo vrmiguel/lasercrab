@@ -43,7 +43,7 @@ impl Canvas {
         catch!(f);
         let mut f = BufWriter::new(f.unwrap());
 
-        let res = write!(f, "P6\n{} {}\n{}\n", self.width, self.height, 255);
+        let res = write!(f, "P6\n{} {}\n255\n", self.width, self.height);
         catch!(res);
 
         let mut bytes = Vec::with_capacity(self.height * self.width * 3);

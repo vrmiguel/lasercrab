@@ -63,15 +63,19 @@ fn render (spheres: &mut Vec<Sphere>, lights: &mut Vec<Light>, filename: &str) {
         for i in 0..WIDTH {
             let (iu, ju) = (i, j);
             let (i, j) = ((2*i) as f64, (2*j) as f64); 
-            let x =  ((i + 1.)/WIDTH_F  - 1.0)*f64::tan(FOV/2.)*WIDTH_F/HEIGHT_F;
-            let y = -((j + 1.)/HEIGHT_F - 1.0)*f64::tan(FOV/2.);
-            let dir = Vec3f::new(x, y, -1.0).normalize();
+            let x =  (i + 1.) - WIDTH_F;
+            let y = -(j + 1.) + HEIGHT_F;
+            let dir = Vec3f::new
+                (x, 
+                 y, 
+                 -HEIGHT_F/(f64::tan(FOV/2.0)))
+                .normalize();
             let ray = Ray::new(ORIGIN, dir);
             canvas.set(iu, ju, ray.cast(spheres, lights, 0));
         }
     }
 
-    canvas.save_to_image(&format!("{}.ppm", filename).to_string());
+    canvas.save_to_image(&format!("{}.ppm", filename));
  
 }
 

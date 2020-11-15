@@ -3,7 +3,7 @@
 Lasercrab is a KISS implementation of an al-Haytham's model based ray-tracer, written in Rust.
 
 [![Lasercrab example](https://user-images.githubusercontent.com/36349314/99035080-9102d400-255d-11eb-8991-442675396a75.png)](https://youtu.be/zLz4_43jUxo "Lasercrab Animation")
-_Click on the image above to watch a small animation made with Lasercrab. Hosted on YouTube._
+_Click on the image above to watch a small 4K60 animation made with Lasercrab. Hosted on YouTube._
 
 
 ## Building
@@ -23,7 +23,7 @@ cargo run --release
 cargo run --release --features parallel
 ```
 
-_Warning_: by default, this will render 599 frames at 1080p, where each one takes 5.9MiB of space.
+_Warning_: by default, this will render 600 frames at 1080p, where each one takes 5.9MiB of space.
 
 ## Usage
 
@@ -40,8 +40,9 @@ ffmpeg -framerate 60 -i output_%d.ppm -c:v libx264 -pix_fmt yuv420p output_anim.
 
 ## TODO
 
-Things I want (or may) implement in the future
+Things I want to implement in the future.
 
+* `.obj` loader;
 * Snell's law based refractions;
 * Add command-line arguments using [Clap](https://github.com/clap-rs/clap);
 * Add the [image](https://crates.io/crates/image) crate as an optional dependency.

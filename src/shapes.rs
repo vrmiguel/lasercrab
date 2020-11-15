@@ -54,7 +54,7 @@ impl Ray {
 				*N = Vec3f::new(0., 1., 0.);
 				let val_a = (0.5*(hit[0])+1000.) as i32;
 				let val_b = (0.5 * hit[2]) as i32;
-				material.diffuse_color = if (val_a + val_b & 1) > 0 {
+				material.diffuse_color = if ((val_a + val_b) & 1) > 0 {
 					BIG_FOOT_FEET
 				} else {
 					WHITE
