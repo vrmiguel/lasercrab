@@ -2,7 +2,7 @@
 
 Lasercrab is a KISS implementation of an al-Haytham's model based ray-tracer, written in Rust.
 
-[![Lasercrab example](https://user-images.githubusercontent.com/36349314/99035080-9102d400-255d-11eb-8991-442675396a75.png)](https://youtu.be/zLz4_43jUxo "Lasercrab Animation")
+[![Lasercrab example](https://user-images.githubusercontent.com/36349314/99178571-2f746e00-26f3-11eb-8b37-c1e484499a45.png)](https://youtu.be/zLz4_43jUxo "Lasercrab Animation")
 _Click on the image above to watch a small 4K60 animation made with Lasercrab. Hosted on YouTube._
 
 

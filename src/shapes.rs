@@ -43,7 +43,6 @@ impl Ray {
 
 		let mut checkerboard_dist = f64::MAX;
 
-
 		if f64::abs(self.direction[1]) > 0.001 
 		{
 			let d = -(self.origin[1]+4.)/self.direction[1];
@@ -58,7 +57,10 @@ impl Ray {
 					BIG_FOOT_FEET
 				} else {
 					WHITE
-				}
+				};
+				// Comment the two lines below if you wish to make the floor not reflexive
+				material.specular_exponent = 100.;
+				material.albedo = Vec3f::new(0.6, 0.3, 0.3);
 			}
 		}
 
