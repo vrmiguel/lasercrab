@@ -46,6 +46,8 @@ const MIRROR: Material = Material::new (
         1425.
 );
 
+// The spheres used on the scene.
+// Feel free to modify 
 const SPHERES: [Sphere; 5] = [
                 Sphere::new(Vec3f::new(-20., 5., -20.), 6., MIRROR),
                 Sphere::new(Vec3f::new(-3. , 0., -16.), 2., IVORY),
@@ -88,6 +90,8 @@ fn main() {
 
     #[cfg(feature = "parallel")]
     {
+        // If using Rayon, we'll make a small animation of 600 frames
+        // This could take long
         (0..600).into_par_iter().for_each(|i|
         {
             let i = i as f64;
@@ -129,6 +133,7 @@ fn main() {
 
     #[cfg(not(feature = "parallel"))]
     {
+        // If not using Rayon, render a simple scene
         let mut lights = Vec::with_capacity(3);
 
         lights.push(Light::new(Vec3f::new(-20., 20., 20.), 1.5));

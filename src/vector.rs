@@ -15,7 +15,7 @@ pub const ORIGIN: Vec3f = Vec3f::new(0., 0., 0.);
 pub const I: Vec3f      = Vec3f::new(1., 0., 0.);
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-/// Simple Three-dimensional euclidian otherector
+/// Simple three-dimensional euclidian vector
 pub struct Vec3f {
 	pub x: f64,
 	pub y: f64,
@@ -32,12 +32,14 @@ impl Vec3f {
 		}
 	}
 
+	/// Dot product
 	pub fn dot(& self, other: &Vec3f) -> f64 {
 		self.x * other.x +
 		self.y * other.y +
 		self.z * other.z
 	}
 
+	/// Cross product
 	pub fn cross(&self, other: &Vec3f) -> Vec3f {
 		Vec3f::new (
 			self.y * other.z - self.z * other.y,
@@ -70,11 +72,6 @@ impl Add for &Vec3f {
 		)
 	}
 }
-
-// impl Sub<f64> for Vec3f {
-// 	type Output = Vec3f;
-
-// }
 
 impl Sub for Vec3f {
 	type Output = Vec3f;
@@ -156,6 +153,7 @@ pub fn reflect(J: Vec3f, N: Vec3f) -> Vec3f {
     J - N * 2. * J.dot(&N)
 }
 
+// TODO: I'm pretty sure this is wrong
 #[cfg(feature = "rotate_camera")]
 pub fn rotate_camera(origin: Vec3f, dir: Vec3f, target: Vec3f)  -> Vec3f {
    let z_axis  = (origin - target).normalize();
@@ -202,7 +200,6 @@ pub type Mat4f = [Vec4f; 4];
 
 /// Multiplication of a 4x4 matrix with a 4x1 vector.
 #[cfg(feature = "rotate_camera")]
-
 impl Mul<Vec4f> for Mat4f {
 	type Output = Vec4f;
 	fn mul (self, other: Vec4f) -> Vec4f {

@@ -137,7 +137,6 @@ impl Ray {
 	
 }
 
-/// 
 #[derive(Copy, Clone)]
 pub struct Sphere {
 	center: Vec3f,
@@ -155,21 +154,18 @@ impl Sphere {
 		}
 	}
 
-	/// intersects_with_ray checks if the ray originating from `origin`, in the direction of `dir`
-	/// intersects with the sphere.
 	#[allow(non_snake_case)]
 	pub fn intersects_with_ray (&mut self, ray: Ray) -> Option<f64>
 	{
-		// Create a line segment between the ray origin and the center of the sphere
+		// L is a line segment between the ray's origin and the sphere's centre
 		let L: Vec3f = self.center - ray.origin;
-		//Use l as a hypotenuse and find the length of the adjacent side
+		// length of the adjacent side
 		let adj = L.dot(&ray.direction);
-		//Find the length-squared of the opposite side
-		//This is equivalent to (but faster than) (l.length() * l.length()) - (adj2 * adj2)
+		// d2 is the length-squared of the opposite side
 		let d2 = L.dot(&L) - (adj * adj);
 		let radius_sqr = self.radius * self.radius;
-		//If that length-squared is less than radius squared, the ray intersects the sphere
 		if d2 > radius_sqr {
+			// Ray intersects square
 			return None;
 		}
 		let thc = f64::sqrt(radius_sqr - d2);
