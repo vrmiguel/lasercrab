@@ -96,7 +96,7 @@ impl AddAssign for Vec3f {
 	fn add_assign(&mut self, other: Self) {
 		*self = Self {
 			x: self.x + other.x,
-			y: self.x + other.y,
+			y: self.y + other.y,
 			z: self.z + other.z
 		};
 	}
